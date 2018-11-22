@@ -1,6 +1,6 @@
 # News Scrapper
 
-Indonesian news scrapper with Python3
+Indonesian news scrapper with Python3.
 
 List of scrap website (include to-do scrap and already scrapped):
 
