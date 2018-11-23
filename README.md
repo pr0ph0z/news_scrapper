@@ -4,7 +4,7 @@ Indonesian news scrapper with Python3.
 
 List of scrap website (include to-do scrap and already scrapped):
 
-- [x] Detik
+- [x] ~~Detik~~
 - [ ] Merdeka
 - [ ] CNN Indonesia
 - [ ] Kompas
