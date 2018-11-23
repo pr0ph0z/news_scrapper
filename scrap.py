@@ -51,10 +51,15 @@ def parseNews(html):
                 s.append(content+"\n")
         w = ''.join(map(str, s))
     else:
+        s = []
         for i in html:
             if type(i) is Tag or type(i) is Comment:
                 i.extract()
-    return html
+        for i2 in html:
+            if i2 is not '\n':
+                print(i2)
+                s.append(i2)
+    return s
 
 def getContent(html):
     return html['content']
