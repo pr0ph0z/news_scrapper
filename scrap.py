@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup, Comment, NavigableString, Tag
 from pprint import pprint
 import requests
 import re
+import bs4
 
 def search(url):
     data = requests.get(url)
@@ -55,15 +56,22 @@ def parseNews(html):
         for i in html:
             if type(i) is Tag or type(i) is Comment:
                 i.extract()
+        for i3 in html.find_all('br'):
+            i3.extract()
+        for i3 in html.find_all('table'):
+            i3.extract()
+        for i3 in html.find_all('strong'):
+            i3.extract()
         for i2 in html:
-            if i2 is not '\n':
-                print(i2)
-                s.append(i2)
-    return s
+            if "\n" not in i2:
+                if i2.strip():
+                    s.append(i2)
+        s = ''.join(map(str, s))
+    return html
 
 def getContent(html):
     return html['content']
 
 if __name__ == "__main__":
     # search("https://www.detik.com/search/searchall?query=prabowo")
-    getNews("https://news.detik.com/berita-jawa-tengah/d-4313269/cerita-prabowo-pernah-ditugasi-kejar-amien-rais-saat-orde-baru?_ga=2.249759430.1941936459.1542813273-658614994.1535639714")
+    getNews("https://news.detik.com/berita/4314642/sebut-gaji-tukang-ojek-besar-tim-jokowi-makanya-pak-prabowo-gaul")
