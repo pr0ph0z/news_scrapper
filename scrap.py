@@ -79,9 +79,11 @@ def parseNews(html, article_type = "normal"):
         s  = {}
         title = html.find("h6").get_text()
         title = re.sub("\d\. ", "", title)
-        print(title)
+        s.update({
+            "title": title
+        })
 
-    # return s
+    return html
 
 def getContent(html):
     return html['content']
