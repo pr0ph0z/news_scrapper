@@ -34,10 +34,18 @@ def getNews(url):
     # print("LAH")
 
 def parseNews(html):
+    s = []
     html.find("div", {"class": "title-section_terkait"}).decompose()
     html.find("ul", {"id": "list-section_terkait"}).decompose()
     html.find("div").unwrap()
-    pprint(len(html.get_text()))
+    for i in html.get_text().split("\n"):
+        if i.strip():
+            i = re.sub(" \[(.*?)]", "", i)
+            s.append(i)
+    text_file = open("output_test.txt", "w")
+    text_file.write('\n'.join(map(str, s)))
+    text_file.close()
+    print(s)
     # return html
 
 def getContent(html):
