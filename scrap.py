@@ -8,9 +8,10 @@ def search(url):
     data = requests.get(url)
     data = data.content
     soup = BeautifulSoup(data, "html.parser")
-    results = soup.findAll("article")
-    for result in results:
-        getNews(result.a['href'])
+    print(soup)
+    # results = soup.findAll("article")
+    # for result in results:
+    #     getNews(result.a['href'])
 
 def getNews(url):
     data = requests.get(url)
@@ -20,7 +21,7 @@ def getNews(url):
     url = getContent(soup.find("meta", {"property": "og:url"}))
     image = getContent(soup.find("meta", {"property": "og:image"}))
     author = getContent(soup.find("meta", {"name": "author"}))
-    news = parseNews(soup.find("div", {"id": "detikdetailtext"}))
+    news = parseNews(soup.find("div", {"class": "mdk-body-paragpraph"}))
 
     result = {
         "title": title,
@@ -30,48 +31,18 @@ def getNews(url):
         "news": news
     }
 
-    print(news)
+    # print("LAH")
 
 def parseNews(html):
-    invalid_tags = ['p', 'a', 'br']
-    p = html.find_all("p")
-    if len(p) > 0:
-        s = []
-        a = None
-        for i in p:
-            if(i.a):
-                i.a.unwrap()
-            if(i.br):
-                i.br.extract()
-            i.extract()
-            content = str(i.contents)
-            content = re.sub("^(\[')|(\[])|(\[\")|(\"])|\[<br\s*/?>\]", "", content)
-            content = re.sub("(\'])$", " ", content)
-            content = content.replace("', '", "")
-            if content.strip():
-                s.append(content+"\n")
-        w = ''.join(map(str, s))
-    else:
-        s = []
-        for i in html:
-            if type(i) is Tag or type(i) is Comment:
-                i.extract()
-        for i3 in html.find_all('br'):
-            i3.extract()
-        for i3 in html.find_all('table'):
-            i3.extract()
-        for i3 in html.find_all('strong'):
-            i3.extract()
-        for i2 in html:
-            if "\n" not in i2:
-                if i2.strip():
-                    s.append(i2)
-        s = ''.join(map(str, s))
-    return html
+    html.find("div", {"class": "title-section_terkait"}).decompose()
+    html.find("ul", {"id": "list-section_terkait"}).decompose()
+    html.find("div").unwrap()
+    pprint(len(html.get_text()))
+    # return html
 
 def getContent(html):
     return html['content']
 
 if __name__ == "__main__":
-    # search("https://www.detik.com/search/searchall?query=prabowo")
-    getNews("https://news.detik.com/berita/4314642/sebut-gaji-tukang-ojek-besar-tim-jokowi-makanya-pak-prabowo-gaul")
+    # search("https://www.merdeka.com/cari/?q=prabowo")
+    getNews("https://www.merdeka.com/politik/prabowo-kesulitan-dana-kampanye-minta-kredit-dari-bank-indonesia-enggak-dapat.html")
