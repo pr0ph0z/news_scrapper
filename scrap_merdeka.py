@@ -1,3 +1,8 @@
+'''
+Merdeka news scrapper
+Search method is not supported here because they're using Google CSE (huh)
+'''
+
 from bs4 import BeautifulSoup, Comment, NavigableString, Tag
 from pprint import pprint
 import requests
@@ -39,27 +44,29 @@ def getNews(url):
         regex_arrow = re.compile('<a class="arrow.*"></a>')
         regex_intro = re.compile('<a href=".*">Intro</a>')
         filtered = [str(i) for i in a if not regex_arrow.search(str(i)) and not regex_intro.search(str(i))]
+        title = getContent(soup.find("meta", {"property": "og:title"}))
+        url = getContent(soup.find("meta", {"property": "og:url"}))
+        image = getContent(soup.find("meta", {"property": "og:image"}))
+        author = getContent(soup.find("meta", {"name": "author"}))
+
+        result = {
+            "title": title,
+            "url": url,
+            "image": image,
+            "author": author,
+            "news": []
+        }
 
         for i in filtered:
             search = re.compile('(?<=href=").*?(?=")')
             data = requests.get(search.search(i).group(0))
             data = data.content
             soup = BeautifulSoup(data, "html.parser")
-            title = getContent(soup.find("meta", {"property": "og:title"}))
-            url = getContent(soup.find("meta", {"property": "og:url"}))
-            image = getContent(soup.find("meta", {"property": "og:image"}))
-            author = getContent(soup.find("meta", {"name": "author"}))
             news = parseNews(soup.find("div", {"class": "mdk-body-paragpraph"}), "paging")
 
-            result = {
-                "title": title,
-                "url": url,
-                "image": image,
-                "author": author,
-                "news": news
-            }
+            result["news"].append(news)
 
-            print(news)
+        print(result)
 
 def parseNews(html, article_type = "normal"):
     if article_type is "normal":
@@ -77,13 +84,20 @@ def parseNews(html, article_type = "normal"):
         text_file.close()
     else:
         s  = {}
-        title = html.find("h6").get_text()
-        title = re.sub("\d\. ", "", title)
+        w = []
+        subtitle = html.find("h6").get_text()
+        subtitle = re.sub("\d\. ", "", subtitle)
+        content = html.find("h6", {"class":"title-dt-paging"}).extract()
+        subnews = html.get_text()
+        subnews = re.sub("(^\\n\\n)|((Baca juga.*))", "", subnews)
+        subnews = re.sub("(\\n)", " ", subnews)
+        
         s.update({
-            "title": title
+            "subtitle": subtitle,
+            "subnews": subnews
         })
 
-    return html
+        return s
 
 def getContent(html):
     return html['content']
